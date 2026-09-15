@@ -1,0 +1,14 @@
+================================================================================
+MOVE AND TEAM-ACTION POOL TEMPLATE
+================================================================================
+
+A pool is a GM-managed unlock group. Unlocking a pool makes every move and team
+action assigned to that pool available at once, subject to class, participant,
+and other action rules.
+
+POOL_ID:
+VERSION:
+NAME:
+DESCRIPTION:
+
+UNLOCK_CONDITION: GM_GRANTS

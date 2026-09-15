@@ -1,0 +1,50 @@
+ID: king_knight
+VERSION: 2026-08-08
+NAME: King Knight
+DESCRIPTION: A true King fights alongside his subjects.
+
+TIER_1:
+  TIER_LEVEL: 1
+  ACTIONS:
+    ACTION_1:
+      NAME: Exploding rats
+      DESCRIPTION: Deal 5 Damage (5 Uses)
+      CHARGES: 5
+      EFFECTS:
+        EFFECT_TYPE: DAMAGE
+        AMOUNT: 5
+        TARGET: ENEMY
+  UNLOCK_CONDITIONS:
+    gm_grants
+
+TIER_2:
+  TIER_LEVEL: 2
+  ACTION_2:
+      NAME:Horns of Herolding
+      DESCRIPTION: 3 less players are targeted next round (3 uses)
+      CHARGES: 3
+      EFFECTS:
+        EFFECT_TYPE: STATUS
+        STATUS_ID: PROTECTED
+        DURATION: 1
+        TARGET: RANDOM_ALLY_DANGER
+  UNLOCK_CONDITIONS:
+    player_upgrade_tier_1
+
+TIER_3:
+  TIER_LEVEL: 3
+  ACTIONS:
+    ACTION_3:
+      NAME: Turncoat
+      DESCRIPTION: Deal 10 damage and prevent the enemy from attacking next turn (1 Use)
+      CHARGES: 1
+      EFFECTS:
+        EFFECT_TYPE: DAMAGE
+        AMOUNT: 10
+        TARGET: ENEMY
+
+        EFFECT_TYPE: STATUS
+        STATUS_ID: STUNNED 
+        DURATION: 1
+  UNLOCK_CONDITIONS:
+    player_upgrade_tier_2

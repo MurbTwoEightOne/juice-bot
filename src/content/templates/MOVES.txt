@@ -1,0 +1,30 @@
+================================================================================
+MOVE DEFINITION TEMPLATE
+================================================================================
+
+A move is an individual action a player can learn and equip (max 4 equipped).
+
+--------------------------------------------------------------------------------
+TEMPLATE STRUCTURE
+--------------------------------------------------------------------------------
+
+
+
+ID: 
+VERSION: 
+NAME: 
+CLASS:
+POOL:
+DESCRIPTION: 
+CHARGES: 
+WINDUP: 
+COOLDOWN:
+MOD: 
+EFFECTS:
+  EFFECT_TYPE: 
+  AMOUNT: 
+  STATUS_ID: 
+  DURATION: 
+  TARGET: 
+  COUNT: 
+

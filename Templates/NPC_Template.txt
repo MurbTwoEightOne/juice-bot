@@ -1,0 +1,57 @@
+ID: 
+VERSION: 
+NAME: 
+DESCRIPTION: 
+
+TIER_1:
+  TIER_LEVEL: 1
+  ACTIONS:
+    ACTION_1:
+      NAME: 
+      DESCRIPTION: 
+      CHARGES: 5
+      WINDUP: 
+      MOD: 
+      EFFECTS:
+        EFFECT_TYPE: 
+        AMOUNT: 
+        STATUS_ID: 
+        DURATION: 
+        TARGET: 
+  UNLOCK_CONDITIONS:
+    gm_grants
+
+TIER_2:
+  TIER_LEVEL: 2
+  ACTION_2:
+      NAME: 
+      DESCRIPTION: 
+      CHARGES: 3
+      WINDUP: 
+      MOD: 
+      EFFECTS:
+        EFFECT_TYPE: 
+        AMOUNT: 
+        STATUS_ID: 
+        DURATION: 
+        TARGET: 
+  UNLOCK_CONDITIONS:
+    player_upgrade_tier_1
+
+TIER_3:
+  TIER_LEVEL: 3
+  ACTIONS:
+    ACTION_3:
+      NAME: 
+      DESCRIPTION:
+      CHARGES: 1
+      WINDUP: 
+      MOD: 
+      EFFECTS:
+        EFFECT_TYPE: 
+        AMOUNT: 
+        STATUS_ID: 
+        DURATION: 
+        TARGET: 
+  UNLOCK_CONDITIONS:
+    player_upgrade_tier_2

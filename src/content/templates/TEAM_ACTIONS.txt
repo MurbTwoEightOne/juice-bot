@@ -1,0 +1,32 @@
+================================================================================
+TEAM ACTION DEFINITION TEMPLATE & EXAMPLES
+================================================================================
+
+A team action is a combination move requiring specific class pairs/groups.
+Multiple class combinations (Fighter+Support, Support+Utility, etc.) can have
+different team actions available.
+
+All participants spend their action for the round.
+
+--------------------------------------------------------------------------------
+TEMPLATE STRUCTURE
+--------------------------------------------------------------------------------
+
+ID: 
+VERSION: 
+NAME: 
+CLASSES:
+POOL:
+DESCRIPTION: 
+CHARGES: 
+WINDUP: 
+COOLDOWN:
+MOD: 
+EFFECTS:
+  EFFECT_TYPE: 
+  AMOUNT: 
+  STATUS_ID: 
+  DURATION: 
+  TARGET: 
+  COUNT: 
+

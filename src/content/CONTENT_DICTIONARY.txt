@@ -1,0 +1,382 @@
+================================================================================
+CONTENT DICTIONARY
+================================================================================
+
+This dictionary defines the allowed values for every controlled template field.
+It does not restrict IDs, names, or flavor/descriptions. Those are authored by
+content designers.
+
+Blank fields are allowed when a field does not apply to an action or effect.
+Do not invent new controlled values without updating this dictionary first.
+
+================================================================================
+GENERAL FIELD RULES
+================================================================================
+
+VERSION:
+  Format: YYYY-MM-DD
+  Meaning: Date the definition was last changed.
+  Example: 2026-09-14
+  Blank:
+    Allowed. A blank version overwrites the previous stored version without
+    creating a dated content version.
+
+  A supplied date is backup metadata. A blank date is also valid and means the
+  latest definition replaces the older stored definition.
+
+NAME:
+  Free text.
+  Meaning: Display name shown to players.
+
+DESCRIPTION:
+  Free text.
+  Meaning: Player-facing explanation or flavor.
+
+POOL:
+  Controlled identifier for a GM-managed unlock pool.
+  Meaning: Moves and team actions assigned to the same pool become available
+  together for every player in the campaign when the GM unlocks that pool.
+  Examples:
+    STARTER
+    FIGHTER_ADVANCED
+    SUPPORT_ADVANCED
+    PARTY_SIGNATURES
+  Blank:
+    The content has no pool. The GM can unlock it directly by targeting its ID.
+  Pool names are identifiers, not balance values. Their definitions should be
+  maintained separately from individual moves and actions.
+  Pool unlocks are campaign-wide. A GM unlocks a pool once and every player
+  gains access to all moves and team actions assigned to that pool.
+  Direct unlocks are also campaign-wide. A GM can unlock an individual move or
+  team action by targeting its ID.
+
+ID:
+  Free text, but must be unique within its content type.
+  Meaning: Stable internal identifier used by the game.
+
+================================================================================
+MOVE FIELDS
+================================================================================
+
+CLASS:
+  FIGHTER
+    A high-damage combat class.
+  SUPPORT
+    A healing and defensive class.
+  UTILITY
+    A character-specific class for control, information, buffs, debuffs, or
+    other special abilities.
+
+CHARGES:
+  Whole number zero or greater.
+  Meaning: Number of times the action can be used before its charges are
+  exhausted.
+  Blank:
+    The action has no configured charge limit.
+  0:
+    The action cannot currently be used. Use only intentionally.
+
+WINDUP:
+  Whole number zero or greater.
+  Meaning: Number of rounds that must pass before the action resolves.
+  0:
+    The action resolves during the current resolution cycle.
+  1:
+    The action resolves after one full round of windup.
+  2 or greater:
+    The action remains in windup for that many rounds before resolving.
+  Blank:
+    Treat as 0.
+
+COOLDOWN:
+  Whole number zero or greater.
+  Meaning: Number of rounds after use before the action can be submitted again.
+  0:
+    No cooldown.
+  Blank:
+    Treat as 0.
+
+MOD:
+  DAMAGE
+    The action's effectiveness modifies damage.
+  HEAL
+    The action's effectiveness modifies healing.
+  COUNT
+    The action's effectiveness modifies a number of affected actors, targets,
+    or incoming actions.
+  DURATION
+    The action's effectiveness modifies how long an effect lasts.
+  None / blank
+    The action has no generic effectiveness modification.
+
+================================================================================
+TEAM ACTION FIELDS
+================================================================================
+
+CLASSES:
+  One or more class values separated by commas.
+  Allowed class values:
+    FIGHTER
+    SUPPORT
+    UTILITY
+
+  Examples:
+    FIGHTER
+    FIGHTER,SUPPORT
+    FIGHTER,UTILITY
+    SUPPORT,UTILITY
+    FIGHTER,SUPPORT,UTILITY
+
+  Class order does not matter. The values describe the required class multiset.
+  Repeated classes are allowed when the recipe requires them.
+
+  Examples with repeated classes:
+    FIGHTER,FIGHTER
+    SUPPORT,SUPPORT
+    UTILITY,UTILITY
+
+  Every listed participant must confirm a team action before it resolves.
+  Every listed participant spends their action for the round.
+
+Team actions use the same CHARGES, WINDUP, COOLDOWN, MOD, and EFFECTS values
+as ordinary moves.
+
+================================================================================
+ENEMY FIELDS
+================================================================================
+
+Enemy definitions use the same top-level metadata and ACTIONS structure as
+items, moves, and team actions. Enemy actions use the same action and effect
+fields as player actions.
+
+ACTIONS:
+  Contains the actions available to the enemy during an enemy phase.
+  In MANUAL mode, the GM selects one of these actions through the same action
+  interface used by players.
+  In AUTOMATED mode, the bot selects from these actions using deterministic
+  encounter randomness.
+
+TARGET values for enemy actions:
+  PLAYER
+    One valid living player selected by the GM or automated policy.
+  ALL_PLAYERS
+    Every valid living player in the encounter.
+  RANDOM_PLAYER
+    One valid living player selected deterministically from the encounter seed.
+  SELF
+    The combined enemy actor.
+
+Enemy actions have no separate mechanics. Damage, status, windup, cooldown,
+charges, and effects resolve through the same action resolver as player moves.
+
+================================================================================
+ENCOUNTER MODES
+================================================================================
+
+MANUAL
+  Default mode. The GM selects and submits enemy actions through the same
+  action UI players use.
+
+AUTOMATED
+  Optional mode selected by an explicit GM command. The bot chooses enemy
+  actions from the enemy definition using deterministic encounter randomness.
+
+================================================================================
+ITEM FIELDS
+================================================================================
+
+TIER_1:
+  The starting tier of an item.
+  Its unlock condition is normally GM-grants or another explicit starting rule.
+
+TIER_2:
+  The second tier of an item.
+  It becomes available only after its configured unlock condition is met.
+
+TIER_3:
+  The final configured tier of an item.
+  It becomes available only after its configured unlock condition is met.
+
+TIER_LEVEL:
+  Allowed values:
+    1
+    2
+    3
+  Meaning: Numeric tier represented by the block.
+
+ACTIONS:
+  Contains one or more item actions.
+  Each action uses the same action fields as moves:
+    NAME
+    DESCRIPTION
+    CHARGES
+    WINDUP
+    COOLDOWN
+    MOD
+    EFFECTS
+
+  Item action charges are independent. Using one action does not spend charges
+  from another action on the same item.
+
+UNLOCK_CONDITIONS:
+  gm_grants
+    A GM grants or enables the tier.
+  gm_grants_special_event
+    A GM grants or enables the tier as part of a special event.
+  player_upgrade_tier_1
+    The item is upgraded from Tier 1 to Tier 2.
+  player_upgrade_tier_2
+    The item is upgraded from Tier 2 to Tier 3.
+  defeat_boss_<identifier>
+    The tier unlocks after defeating the named boss encounter.
+
+  Multiple conditions may be written as plain text for now. The content loader
+  must eventually define whether multiple conditions mean ALL or ANY.
+
+================================================================================
+EFFECT FIELDS
+================================================================================
+
+EFFECT_TYPE:
+  DAMAGE
+    Deal damage to one or more valid targets.
+    Uses AMOUNT and TARGET.
+  HEAL
+    Restore HP to one or more valid targets.
+    Uses AMOUNT and TARGET.
+  STATUS
+    Apply a named status effect.
+    Uses STATUS_ID, DURATION, and TARGET.
+  SHIELD
+    Grant temporary protection.
+    Uses AMOUNT, DURATION, and TARGET.
+  CLEANSE
+    Remove a status effect or configured set of statuses.
+    Uses STATUS_ID and TARGET.
+  NOTHING
+    Produce no combat effect.
+    Used only when a valid no-effect action is needed.
+
+  The current examples use DAMAGE and STATUS. Additional effect types should
+  not be added until their mechanics are defined.
+
+AMOUNT:
+  Whole number zero or greater.
+  Meaning depends on EFFECT_TYPE:
+    DAMAGE
+      Amount of HP removed.
+    HEAL
+      Amount of HP restored, clamped by the target's maximum HP.
+    SHIELD
+      Amount of protection granted.
+  Blank:
+    Required for effect types that do not use a numeric amount.
+
+STATUS_ID:
+  Controlled status identifier.
+  Examples currently used by content:
+    PROTECTED
+    STUNNED
+
+  Status identifiers must be defined by the status system before use.
+  Do not create a new status identifier only by typing it into a move.
+  Blank:
+    Required for effects that do not apply, remove, or reference a status.
+
+DURATION:
+  Whole number zero or greater, measured in rounds.
+  0:
+    The status or effect ends immediately after application, if allowed.
+  1:
+    Lasts through one round.
+  2 or greater:
+    Lasts for that many rounds.
+  Blank:
+    Required for effects that do not have duration.
+
+TARGET:
+  SELF
+    The acting player.
+  ALLY
+    One valid living ally selected by the player.
+  ALL_ALLIES
+    Every valid living ally in the encounter.
+  ENEMY
+    The combined enemy HP pool.
+  RANDOM_ALLY
+    One valid ally selected deterministically using the encounter seed.
+  RANDOM_ALLY_DANGER
+    One ally selected from valid allies using the configured danger rule.
+  PARTICIPANTS
+    All participants in the associated team action.
+
+  TARGET values must be legal for the selected EFFECT_TYPE and action.
+  Dead players are not valid targets for ordinary healing or ally actions.
+
+COUNT:
+  Whole number zero or greater.
+  Meaning: Number of targets, players, attacks, or incoming actions affected
+  by an effect when the effect supports counting.
+  Examples:
+    COUNT: 3
+      Affect three valid targets or actions.
+    COUNT: 1
+      Affect one target or action.
+  Blank:
+    No count-based limit or modification applies.
+
+================================================================================
+ACTION EFFECT COMBINATIONS
+================================================================================
+
+An action may contain multiple ordered effects. Each effect must include only
+fields relevant to its EFFECT_TYPE.
+
+DAMAGE:
+  EFFECT_TYPE: DAMAGE
+  AMOUNT: <damage amount>
+  TARGET: <damage target>
+
+HEAL:
+  EFFECT_TYPE: HEAL
+  AMOUNT: <healing amount>
+  TARGET: <healing target>
+
+STATUS:
+  EFFECT_TYPE: STATUS
+  STATUS_ID: <defined status>
+  DURATION: <rounds>
+  TARGET: <status target>
+  COUNT: <optional count>
+
+SHIELD:
+  EFFECT_TYPE: SHIELD
+  AMOUNT: <shield amount>
+  DURATION: <rounds>
+  TARGET: <shield target>
+
+CLEANSE:
+  EFFECT_TYPE: CLEANSE
+  STATUS_ID: <defined status or ALL when supported>
+  TARGET: <cleanse target>
+
+================================================================================
+REQUIRED VALIDATION RULES
+================================================================================
+
+- IDs must be unique within their content type.
+- VERSION must be present and use YYYY-MM-DD format.
+- CLASS must be one of FIGHTER, SUPPORT, or UTILITY.
+- CLASSES must contain one or more valid class values.
+- Item TIER_LEVEL must match TIER_1, TIER_2, or TIER_3.
+- CHARGES, WINDUP, COOLDOWN, AMOUNT, DURATION, and COUNT must be whole
+  numbers when provided.
+- EFFECT_TYPE must be one of the listed effect types.
+- STATUS_ID must refer to a defined status when the effect uses one.
+- TARGET must be one of the listed target values.
+- Fields that are not relevant to an effect must be blank or omitted.
+- Dead players cannot act and cannot be revived by HEAL.
+- Item charges are independent per action and tier.
+- All randomness must use the encounter seed.
+
+================================================================================

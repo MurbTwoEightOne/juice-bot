@@ -1,0 +1,28 @@
+================================================================================
+ENEMY DEFINITION TEMPLATE
+================================================================================
+
+An enemy definition contains the actions a GM can select during a manual enemy
+phase. The same action fields are used for player moves, team actions, items,
+and enemy actions so the Discord UI can render them consistently.
+
+ID:
+VERSION:
+NAME:
+DESCRIPTION:
+
+ACTIONS:
+  ACTION_1:
+    NAME:
+    DESCRIPTION:
+    CHARGES:
+    WINDUP:
+    COOLDOWN:
+    MOD:
+    EFFECTS:
+      EFFECT_TYPE:
+      AMOUNT:
+      STATUS_ID:
+      DURATION:
+      TARGET:
+      COUNT:
