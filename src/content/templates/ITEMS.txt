@@ -1,0 +1,135 @@
+================================================================================
+ITEM DEFINITION TEMPLATE & EXAMPLES
+================================================================================
+
+An item is granted to a character for a battle and can be upgraded across three tiers.
+Each tier adds an active combat effect that consumes charges or
+an action to activate.
+
+--------------------------------------------------------------------------------
+TEMPLATE
+--------------------------------------------------------------------------------
+
+ID: 
+VERSION: 
+NAME: 
+DESCRIPTION: 
+
+TIER_1:
+  TIER_LEVEL: 1
+  ACTIONS:
+    ACTION_1:
+      NAME: 
+      DESCRIPTION: 
+      CHARGES: 5
+      WINDUP: 
+      COOLDOWN: 
+      MOD: 
+      EFFECTS:
+        EFFECT_TYPE: 
+        AMOUNT: 
+        STATUS_ID: 
+        DURATION: 
+        TARGET: 
+        COUNT: 
+  UNLOCK_CONDITIONS:
+    gm_grants
+
+TIER_2:
+  TIER_LEVEL: 2
+  ACTIONS:
+    ACTION_2:
+      NAME: 
+      DESCRIPTION: 
+      CHARGES: 3
+      WINDUP: 
+      COOLDOWN: 
+      MOD: 
+      EFFECTS:
+        EFFECT_TYPE: 
+        AMOUNT: 
+        STATUS_ID: 
+        DURATION: 
+        TARGET: 
+        COUNT: 
+  UNLOCK_CONDITIONS:
+    player_upgrade_tier_1
+
+TIER_3:
+  TIER_LEVEL: 3
+  ACTIONS:
+    ACTION_3:
+      NAME: 
+      DESCRIPTION:
+      CHARGES: 1
+      WINDUP: 
+      COOLDOWN: 
+      MOD: 
+      EFFECTS:
+        EFFECT_TYPE: 
+        AMOUNT: 
+        STATUS_ID: 
+        DURATION: 
+        TARGET: 
+        COUNT: 
+  UNLOCK_CONDITIONS:
+    player_upgrade_tier_2
+
+================================================================================
+EXAMPLE 1: King Knight
+================================================================================
+
+ID: king_knight
+VERSION: 2026-08-08
+NAME: King Knight
+DESCRIPTION: A true King fights alongside his subjects.
+
+TIER_1:
+  TIER_LEVEL: 1
+  ACTIONS:
+    ACTION_1:
+      NAME: Exploding rats
+      DESCRIPTION: Deal 5 Damage (5 Uses)
+      CHARGES: 5
+      MOD: DAMAGE
+      EFFECTS:
+        EFFECT_TYPE: DAMAGE
+        AMOUNT: 5
+        TARGET: ENEMY
+  UNLOCK_CONDITIONS:
+    gm_grants
+
+TIER_2:
+  TIER_LEVEL: 2
+    ACTION_2:
+      NAME:Horns of Herolding
+      DESCRIPTION: 3 less players are targeted next round (3 uses)
+      CHARGES: 3
+      MOD: COUNT
+      EFFECTS:
+        EFFECT_TYPE: STATUS
+        STATUS_ID: PROTECTED
+        DURATION: 1
+        TARGET: RANDOM_ALLY_DANGER
+        COUNT: 3
+  UNLOCK_CONDITIONS:
+    player_upgrade_tier_1
+
+TIER_3:
+  TIER_LEVEL: 3
+  ACTIONS:
+    ACTION_3:
+      NAME: Turncoat
+      DESCRIPTION: Deal 10 damage and prevent the enemy from attacking next turn (1 Use)
+      CHARGES: 1
+      MOD: DAMAGE
+      EFFECTS:
+        EFFECT_TYPE: DAMAGE
+        AMOUNT: 10
+        TARGET: ENEMY
+
+        EFFECT_TYPE: STATUS
+        STATUS_ID: STUNNED 
+        DURATION: 1
+  UNLOCK_CONDITIONS:
+    player_upgrade_tier_2

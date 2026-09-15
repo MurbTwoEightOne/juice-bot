@@ -1,0 +1,252 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model GuildConfig {
+  id                String   @id @default(cuid())
+  guildId           String   @unique
+  gmRoleIds         String[] @default([])
+  encounterTimeouts EncounterTimeouts @relation(fields: [encounterTimeoutsId], references: [id])
+  encounterTimeoutsId String @unique
+  poolUnlocks        GuildPoolUnlock[]
+  moveUnlocks        GuildMoveUnlock[]
+  teamActionUnlocks  GuildTeamActionUnlock[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model EncounterTimeouts {
+  id              String  @id @default(cuid())
+  playerPlan      Int     @default(300)
+  playerAction    Int     @default(60)
+  enemyAction     Int     @default(60)
+  guildConfig     GuildConfig?
+}
+
+model PlayerCharacter {
+  id                String               @id @default(cuid())
+  guildId           String
+  userId            String
+  name              String
+  level             Int                  @default(1)
+  class             CharacterClass
+  utilityKitId      String?
+  maxHp             Int                  @default(30)
+  currentHp         Int                  @default(30)
+  activeEncounterId String?
+  revision          Int                  @default(0)
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  moves             CharacterMove[]
+  items             CharacterItem[]
+  participants      EncounterParticipant[]
+
+  @@unique([guildId, userId])
+}
+
+enum CharacterClass {
+  FIGHTER
+  SUPPORT
+  UTILITY
+}
+
+model MovePool {
+  id               String               @id
+  version          String?
+  name             String
+  description      String?
+  moves            MoveDefinition[]
+  teamActions      TeamActionDefinition[]
+  guildUnlocks     GuildPoolUnlock[]
+}
+
+model MoveDefinition {
+  id             String   @id
+  version        String?
+  name           String
+  class          CharacterClass
+  utilityKitId   String?
+  poolId         String?
+  pool           MovePool? @relation(fields: [poolId], references: [id])
+  targetRule     String
+  priority       Int      @default(0)
+  cooldownRounds Int?
+  maxCharges     Int?
+  effects        Json
+  tags           String[] @default([])
+  enabled        Boolean  @default(true)
+  guildUnlocks   GuildMoveUnlock[]
+  createdAt      DateTime @default(now())
+}
+
+model CharacterMove {
+  id             String          @id @default(cuid())
+  character      PlayerCharacter @relation(fields: [characterId], references: [id])
+  characterId    String
+  moveId         String
+  learnedAt      DateTime        @default(now())
+  equippedSlot   Int?
+}
+
+model TeamActionDefinition {
+  id                     String   @id
+  version                String?
+  name                   String
+  requiredClassMultiset  String[]
+  poolId                 String?
+  pool                   MovePool? @relation(fields: [poolId], references: [id])
+  prerequisites          Json
+  effects                Json
+  guildUnlocks           GuildTeamActionUnlock[]
+  createdAt              DateTime @default(now())
+}
+
+model GuildPoolUnlock {
+  id             String   @id @default(cuid())
+  guild           GuildConfig @relation(fields: [guildId], references: [guildId])
+  guildId         String
+  pool            MovePool @relation(fields: [poolId], references: [id])
+  poolId          String
+  unlockedAt      DateTime @default(now())
+  source          String
+  @@unique([guildId, poolId])
+}
+
+model GuildMoveUnlock {
+  id             String   @id @default(cuid())
+  guild           GuildConfig @relation(fields: [guildId], references: [guildId])
+  guildId         String
+  move           MoveDefinition @relation(fields: [moveId], references: [id])
+  moveId         String
+  unlockedAt      DateTime @default(now())
+  source          String
+  @@unique([guildId, moveId])
+}
+
+model GuildTeamActionUnlock {
+  id             String   @id @default(cuid())
+  guild           GuildConfig @relation(fields: [guildId], references: [guildId])
+  guildId         String
+  teamAction      TeamActionDefinition @relation(fields: [teamActionId], references: [id])
+  teamActionId    String
+  unlockedAt      DateTime @default(now())
+  source          String
+  @@unique([guildId, teamActionId])
+}
+
+model ItemDefinition {
+  id         String   @id
+  version    String?
+  name       String
+  tiers      Json
+  createdAt  DateTime @default(now())
+}
+
+model CharacterItem {
+  id             String          @id @default(cuid())
+  character      PlayerCharacter @relation(fields: [characterId], references: [id])
+  characterId    String
+  itemId         String
+  tier           Int
+  currentCharges Int
+}
+
+model Encounter {
+  id              String                @id @default(cuid())
+  guildId         String
+  channelId       String
+  messageId       String?
+  state           EncounterState       @default(LOBBY)
+  round           Int                   @default(0)
+  enemyName       String
+  enemyHp         Int
+  enemyMaxHp      Int
+  mode            EncounterMode        @default(MANUAL)
+  deadlines       EncounterDeadlines   @relation(fields: [deadlinesId], references: [id])
+  deadlinesId     String @unique
+  randomSeed      String
+  revision        Int                   @default(0)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  participants    EncounterParticipant[]
+  submissions     ActionSubmission[]
+  events          ResolutionEvent[]
+}
+
+enum EncounterState {
+  LOBBY
+  PLAYER_PLAN
+  PLAYER_ACTION
+  RESOLVE_PLAYERS
+  ENEMY_ACTION
+  ROUND_END
+  PAUSED
+  ENDED
+}
+
+enum EncounterMode {
+  AUTOMATED
+  MANUAL
+}
+
+model EncounterDeadlines {
+  id                 String    @id @default(cuid())
+  playerPlanDeadline DateTime?
+  playerActionDeadline DateTime?
+  enemyActionDeadline DateTime?
+  encounter           Encounter?
+}
+
+model EncounterParticipant {
+  id             String          @id @default(cuid())
+  encounter      Encounter       @relation(fields: [encounterId], references: [id])
+  encounterId    String
+  character      PlayerCharacter @relation(fields: [characterId], references: [id])
+  characterId    String
+  startSnapshot  Json
+  currentHp      Int
+  statuses       Json
+  shield         Int             @default(0)
+  @@unique([encounterId, characterId])
+}
+
+model ActionSubmission {
+  id             String    @id @default(cuid())
+  encounter      Encounter @relation(fields: [encounterId], references: [id])
+  encounterId    String
+  round          Int
+  actorId        String
+  payload        Json
+  locked         Boolean   @default(false)
+  submittedAt    DateTime  @default(now())
+  idempotencyKey String
+  @@unique([encounterId, round, actorId])
+}
+
+model ResolutionEvent {
+  id                 String    @id @default(cuid())
+  encounter          Encounter @relation(fields: [encounterId], references: [id])
+  encounterId        String
+  round              Int
+  phase              EncounterState
+  sequence           Int
+  eventType          String
+  payload            Json
+  definitionVersions Json
+  createdAt          DateTime  @default(now())
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  actorUserId    String?
+  action         String
+  beforeSummary  Json?
+  afterSummary   Json?
+  timestamp      DateTime @default(now())
+  correlationId  String?
+}
